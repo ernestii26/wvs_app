@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                    String     @id
+  username              String     @unique
+  displayName           String?
+  avatar                String     @default("https://i.insider.com/602ee9ced3ad27001837f2ac?width=700")
+  lastDisplayNameChange DateTime?
+  post                  Post[]
+  question              Question[]
+  comment               Comment[]
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String?
+  image     String?
+  createdAt DateTime  @default(now())
+  authorId  String
+  check     Boolean   @default(false)
+  comments  Comment[]
+  author    User      @relation(fields: [authorId], references: [id])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  image     String?
+  createdAt DateTime @default(now())
+  authorId  String
+  solved    Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+}
